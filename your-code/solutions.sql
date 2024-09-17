@@ -62,39 +62,25 @@ FROM (
 SELECT COUNT(*) AS total_records FROM titleauthor;
 
 /*Challenge 3 - Best Selling Authors */
-SELECT
-    a.au_id AS 'AUTHOR ID',
-    a.au_lname AS 'LAST NAME',
-    a.au_fname AS 'FIRST NAME',
-    COUNT(t.title) AS 'TOTAL'
-FROM
-    titleauthor ta
-JOIN
-    authors a ON ta.au_id = a.au_id
-JOIN
-    titles t ON ta.title_id = t.title_id
-GROUP BY
-    a.au_id
-ORDER BY
-    COUNT(t.title) DESC
+SELECT a.au_id 'AUTHOR ID', a.au_lname 'LAST NAME', a.au_fname 'FIRST NAME',
+SUM(s.qty) 'TOTAL'
+FROM authors a
+JOIN titleauthor ta USING (au_id)
+JOIN titles t USING (title_id)
+JOIN sales s USING (title_id)
+GROUP BY a.au_id
+ORDER BY SUM(s.qty) DESC
 LIMIT 3;
 
 /*Challenge 4 - Best Selling Authors Ranking */
-SELECT
-    a.au_id AS 'AUTHOR ID',
-    a.au_lname AS 'LAST NAME',
-    a.au_fname AS 'FIRST NAME',
-    COALESCE(COUNT(t.title), 0) AS 'TOTAL'
-FROM
-    authors a
-LEFT JOIN
-    titleauthor ta ON a.au_id = ta.au_id
-LEFT JOIN
-    titles t ON ta.title_id = t.title_id
-GROUP BY
-    a.au_id
-ORDER BY
-    TOTAL DESC;
+SELECT a.au_id 'AUTHOR ID', a.au_lname 'LAST NAME', a.au_fname 'FIRST NAME',
+IFNULL(SUM(s.qty),0) AS 'TOTAL'
+FROM authors a
+LEFT JOIN titleauthor ta USING (au_id)
+LEFT JOIN titles t USING (title_id)
+LEFT JOIN sales s USING (title_id)
+GROUP BY a.au_id
+ORDER BY TOTAL DESC;
 
 
 
